@@ -6,7 +6,7 @@ var assert = require('assert');
 
 var cloud = true;
 
-var mongodbHost = '192.168.152.128';
+var mongodbHost = '192.168.152.131';
 var mongodbPort = '4088';
 
 var authenticate ='';
@@ -22,29 +22,32 @@ authenticate = 'Ted_ming:ming94812@'
 
 var mongodbDatabase = 'luckydraw';
 
-var url = 'mongodb://'+authenticate + mongodbHost +':' + mongodbPort + '/' + mongodbDatabase;
+var url = 'mongodb://'+authenticate + mongodbHost +':' + mongodbPort +'/' + mongodbDatabase;
 
-MongoClient.connect(url, function(err, database){
+
+
+app.get('/getList',function(req,res){
+MongoClient.connect(url, function(err, client){
 	if(err) return console.error(err);
 	assert.equal(null,err);
 	console.log("Connected correctly to server.");
-	global.db = database;	
-});
-
-app.get('/getList',function(req,res){
-	db.collection('ShopInfo').find({},{"style" : "Rice"}).limit(3).toArray(function(err,results){
+	db = client.db(mongodbDatabase);
+		db.collection('ShopInfo').find({},{fields:{_id: 0, validate: 0}}).toArray(function(err,results){
 	if(err) return err;
 	res.json(results);
-	db.close();
-	res.end(results);
-	exit(0);
+	console.log(results);
+	res.end();
 });
+client.close();
+
+});
+
 
 });
 
 app.listen(4088,function(){
 console.log("Service start");
-})
+});
 
 
 
